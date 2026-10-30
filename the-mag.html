@@ -1,0 +1,1616 @@
+<title>The Mag</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* Layout: flat colour blocks butted edge to edge — a burgundy masthead slab, a
+   light-blue issue banner, and a hard-ruled grid of alternating panels. One issue
+   at a time; a released issue leads with a cover story. No shadows, no round corners. */
+:root {
+  --paper:      #eaf2f9;
+  --paper-sunk: #d6e6f3;
+  --ink:        #2b0b17;
+  --ink-soft:   #6b4653;
+  --rule:       #aac6de;
+  --accent:     #7d1733;
+  --accent-ink: #f4f9fc;
+  --mark:       #a7d2ed;
+  --mark-ink:   #2b0b17;
+  --block-a:    #ffffff;
+  --block-b:    #dfecf7;
+
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --body: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #1c0710;
+    --paper-sunk: #300c1a;
+    --ink:        #f4e8eb;
+    --ink-soft:   #c49dab;
+    --rule:       #6b2038;
+    --accent:     #9ccbe8;
+    --accent-ink: #1c0710;
+    --mark:       #9e2340;
+    --mark-ink:   #fdeef2;
+    --block-a:    #250913;
+    --block-b:    #32101f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:      #1c0710;
+  --paper-sunk: #300c1a;
+  --ink:        #f4e8eb;
+  --ink-soft:   #c49dab;
+  --rule:       #6b2038;
+  --accent:     #9ccbe8;
+  --accent-ink: #1c0710;
+  --mark:       #9e2340;
+  --mark-ink:   #fdeef2;
+  --block-a:    #250913;
+  --block-b:    #32101f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--paper);
+  z-index: 40;
+}
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 900; margin: 0; text-wrap: balance; letter-spacing: -0.015em; }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ---------- bar ---------- */
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 30;
+  background: var(--paper);
+  border-bottom: 4px solid var(--ink);
+}
+.bar-in { display: flex; align-items: center; gap: 12px; padding-block: 10px; flex-wrap: wrap; }
+.bar-mark {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.04em;
+  margin-right: auto;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.bar-mark em { font-style: normal; color: var(--accent); }
+.tabs { display: flex; gap: 2px; min-width: 0; flex-wrap: wrap; }
+.tab { background: none; border: 2px solid transparent; padding: 5px 9px; color: var(--ink-soft); }
+.tab[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); }
+.tab[aria-pressed="true"] .n { color: var(--mark); }
+.tab .n { color: var(--accent); margin-left: 4px; }
+
+.btn {
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 7px 14px;
+  border-radius: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.btn.ghost { background: none; color: var(--ink); border-color: var(--ink); }
+.btn.accent { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { padding: 4px 10px; font-size: 10px; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.me { display: flex; align-items: center; gap: 7px; }
+.av { width: 26px; height: 26px; border-radius: 0; display: block; background: var(--paper-sunk); }
+.av.lg { width: 34px; height: 34px; }
+
+/* ---------- masthead ---------- */
+.head {
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 22px clamp(18px, 4vw, 34px) 26px;
+  margin-top: 26px;
+}
+.plate {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px 20px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 2px solid currentColor;
+  margin-bottom: 16px;
+  opacity: 0.92;
+}
+.head h1 {
+  font-size: clamp(52px, 16vw, 140px);
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  font-variation-settings: "SOFT" 0, "WONK" 1;
+  padding-bottom: 14px;
+  border-bottom: 2px solid currentColor;
+}
+.head h1 em { font-style: normal; color: var(--mark); }
+.dek {
+  margin-top: 18px;
+  max-width: 46em;
+  font-size: 16px;
+  color: inherit;
+  opacity: 0.9;
+  columns: 2;
+  column-gap: 30px;
+}
+@media (max-width: 640px) { .dek { columns: 1; } }
+.dek b { color: var(--mark-ink); font-weight: 600; background: var(--mark); padding: 0 4px; }
+.issue { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 20px; color: inherit; opacity: 0.85; }
+.issue b { color: var(--mark); font-weight: 600; font-variant-numeric: tabular-nums; opacity: 1; }
+
+/* ---------- issue banner ---------- */
+.banner {
+  background: var(--mark);
+  color: var(--mark-ink);
+  border-left: 14px solid var(--accent);
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.banner.out { border-left-color: var(--ink); }
+.banner .kicker { color: var(--mark-ink); opacity: 0.7; }
+.banner .grow { flex: 1; min-width: 200px; }
+.banner h2 { font-size: 26px; line-height: 1.05; }
+.banner p { color: inherit; opacity: 0.78; font-size: 14.5px; margin-top: 3px; }
+.desk {
+  background: var(--paper-sunk);
+  color: var(--ink);
+  border-left: 14px solid var(--ink);
+  border-top: 3px solid var(--ink);
+}
+.desk .kicker { color: var(--accent); opacity: 1; }
+.desk .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.seg { display: inline-flex; border: 2px solid var(--ink); overflow: hidden; }
+.seg button { background: none; border: 0; padding: 5px 11px; color: var(--ink-soft); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* ---------- contents ---------- */
+.toc { border-top: 4px solid var(--ink); border-bottom: 4px solid var(--ink); margin-top: 26px; padding-block: 14px 8px; }
+.toc .toc-head { display: flex; align-items: baseline; gap: 12px; color: var(--accent); padding-bottom: 8px; }
+.toc .toc-head .rule { flex: 1; height: 2px; background: var(--rule); }
+.toc button {
+  display: flex; width: 100%; gap: 12px; align-items: baseline; flex-wrap: wrap;
+  background: none; border: 0; border-top: 1px solid var(--rule);
+  padding: 9px 0; text-align: left;
+}
+.toc button:first-of-type { border-top: 0; }
+.toc button:hover .t { color: var(--accent); }
+.toc .no { font-family: var(--mono); font-size: 12px; color: var(--accent); min-width: 2.4em; font-variant-numeric: tabular-nums; }
+.toc .t { font-family: var(--display); font-weight: 900; font-size: 19px; letter-spacing: -0.02em; }
+.toc .a { font-family: var(--display); font-style: italic; color: var(--ink-soft); }
+.toc .leader { flex: 1; min-width: 24px; border-bottom: 2px dotted var(--rule); transform: translateY(-5px); }
+.toc .pg { color: var(--ink-soft); }
+
+/* ---------- lead ---------- */
+.lead { padding: 28px 0 30px; border-bottom: 4px solid var(--ink); display: grid; gap: 18px; }
+.kicker { color: var(--accent); }
+.lead h2 { font-size: clamp(28px, 6vw, 52px); line-height: 1; }
+.lead .artist { font-family: var(--display); font-size: clamp(17px, 3vw, 23px); font-weight: 400; font-style: italic; color: var(--ink-soft); margin-top: 6px; }
+.lead .pull {
+  font-family: var(--display);
+  font-size: clamp(18px, 2.6vw, 23px);
+  line-height: 1.35;
+  max-width: 32em;
+  background: var(--mark);
+  color: var(--mark-ink);
+  border-left: 14px solid var(--accent);
+  padding: 16px 20px;
+}
+.lead .cols { columns: 2; column-gap: 34px; font-family: var(--display); font-size: 15.5px; line-height: 1.5; }
+.lead .cols p { margin-bottom: 0.85em; break-inside: avoid; }
+.lead .cols p:first-child::first-letter {
+  float: left; font-weight: 900; font-size: 3.6em; line-height: 0.78;
+  padding: 3px 9px 0 0; color: var(--accent);
+}
+@media (max-width: 640px) { .lead .cols { columns: 1; } }
+.lead-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 2px solid var(--rule); padding-top: 14px; }
+
+/* ---------- grid ---------- */
+.sect-head { display: flex; align-items: baseline; gap: 12px; padding-block: 26px 12px; }
+.sect-head #grid-title { color: var(--accent); }
+.sect-head .rule { flex: 1; height: 4px; background: var(--ink); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 282px), 1fr));
+  gap: 4px;
+  background: var(--ink);
+  border: 4px solid var(--ink);
+  margin-bottom: 44px;
+}
+.card { background: var(--block-a); border: 0; text-align: left; padding: 18px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.card:nth-child(even) { background: var(--block-b); }
+.card:hover, .card:focus-visible { box-shadow: inset 0 0 0 5px var(--accent); }
+.card .ftop { display: flex; gap: 10px; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--rule); padding-bottom: 6px; }
+.card .folio { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.card h3 { font-size: 23px; line-height: 1.05; letter-spacing: -0.025em; }
+.card .artist { font-style: italic; font-family: var(--display); color: var(--ink-soft); }
+.card .excerpt { font-size: 14.5px; color: var(--ink-soft); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-foot { margin-top: auto; padding-top: 6px; display: flex; align-items: center; gap: 8px; color: var(--ink-soft); flex-wrap: wrap; }
+.filed { color: var(--accent); }
+.tagged-flag { background: var(--mark); color: var(--mark-ink); padding: 2px 6px; }
+
+.dots { display: inline-flex; gap: 3px; vertical-align: middle; }
+.dot { width: 9px; height: 9px; border: 2px solid var(--accent); }
+.dot.on { background: var(--accent); }
+
+.empty { border: 4px solid var(--ink); background: var(--block-b); padding: 44px 22px; text-align: center; margin-bottom: 44px; display: grid; gap: 10px; justify-items: center; }
+.empty h3 { font-size: 24px; }
+.empty p { color: var(--ink-soft); max-width: 30em; }
+
+/* ---------- back issues ---------- */
+.shelf { display: grid; gap: 4px; background: var(--ink); border: 4px solid var(--ink); margin-bottom: 44px; }
+.shelf button { background: var(--block-a); border: 0; text-align: left; padding: 16px 18px; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.shelf button:nth-child(even) { background: var(--block-b); }
+.shelf button:hover { box-shadow: inset 0 0 0 5px var(--accent); }
+.shelf .no {
+  font-family: var(--display); font-weight: 900; font-size: 26px; letter-spacing: -0.03em;
+  min-width: 56px; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; text-align: center;
+}
+.shelf .ttl { flex: 1; min-width: 160px; }
+.shelf .ttl b { font-weight: 600; }
+
+/* ---------- sheets ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(43, 11, 23, 0.62); z-index: 50; }
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--paper);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 760px) {
+  .sheet { inset: 0 0 0 auto; width: min(620px, 100%); border-left: 6px solid var(--accent); }
+}
+.sheet-bar { position: sticky; top: 0; background: var(--paper); border-bottom: 3px solid var(--ink); display: flex; align-items: center; gap: 10px; padding-block: 10px; z-index: 2; }
+.sheet-body { padding-block: 22px; display: grid; gap: 20px; }
+.sheet h2 { font-size: clamp(27px, 5vw, 38px); line-height: 1.02; }
+.review { font-family: var(--display); font-size: 17px; line-height: 1.6; white-space: pre-wrap; }
+.review::first-letter {
+  float: left; font-weight: 900; font-size: 3.3em; line-height: 0.8;
+  padding: 3px 9px 0 0; color: var(--accent);
+}
+.byline { display: flex; align-items: center; gap: 9px; color: var(--ink-soft); flex-wrap: wrap; }
+.byline b { color: var(--ink); font-weight: 600; font-family: var(--body); }
+
+.block { border-top: 3px solid var(--ink); padding-top: 16px; display: grid; gap: 12px; }
+.block > .mono:first-child { color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rx {
+  border: 2px solid var(--rule);
+  background: none;
+  padding: 5px 11px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.rx .n { margin-left: 6px; color: var(--ink); font-weight: 600; }
+.rx[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-ink); background: var(--accent); }
+.rx[aria-pressed="true"] .n { color: var(--mark); }
+.rx[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+.person { display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--accent); background: var(--block-b); padding: 3px 10px 3px 3px; font-size: 13.5px; }
+.person img { width: 20px; height: 20px; border-radius: 0; }
+.person button { background: none; border: 0; padding: 0 0 0 2px; color: var(--ink-soft); font-size: 15px; line-height: 1; }
+
+.cmt { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding-bottom: 14px; }
+.cmt .body { min-width: 0; }
+.cmt .body p { white-space: pre-wrap; font-size: 15px; margin-top: 2px; }
+.cmt .who { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.cmt .who b { font-weight: 600; font-size: 14.5px; }
+
+/* ---------- reader ---------- */
+.reader {
+  position: fixed; inset: 0; z-index: 45;
+  background: var(--paper-sunk);
+  display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.reader-bar, .reader-foot {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px));
+}
+.reader-bar { background: var(--ink); color: var(--paper); }
+.reader-bar .grow { flex: 1; min-width: 80px; }
+.reader-bar .btn { background: none; color: var(--paper); border-color: var(--paper); }
+.reader-foot { background: var(--paper); border-top: 4px solid var(--ink); }
+.reader-foot .folio { margin-inline: auto; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+.reader-stage {
+  flex: 1; min-height: 0; overflow-y: auto;
+  display: flex; justify-content: center;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) 30px max(16px, env(safe-area-inset-left, 0px));
+}
+.page {
+  background: var(--block-a);
+  border: 4px solid var(--ink);
+  width: min(780px, 100%);
+  align-self: flex-start;
+  padding: clamp(20px, 4vw, 40px);
+  display: grid;
+  gap: 14px;
+}
+.page-head { display: flex; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--rule); padding-bottom: 8px; color: var(--ink-soft); }
+.page h2 { font-size: clamp(26px, 5vw, 44px); line-height: 1; }
+.page .artist { font-family: var(--display); font-style: italic; font-size: 20px; color: var(--ink-soft); }
+.page .cols { columns: 2; column-gap: 34px; font-family: var(--display); font-size: 16px; line-height: 1.55; }
+.page .cols p { margin-bottom: 0.85em; break-inside: avoid; }
+.page .cols p:first-child::first-letter {
+  float: left; font-weight: 900; font-size: 3.6em; line-height: 0.78;
+  padding: 3px 9px 0 0; color: var(--accent);
+}
+@media (max-width: 680px) { .page .cols { columns: 1; } }
+.page-foot { border-top: 2px solid var(--rule); padding-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.page .toc { border-top: 0; border-bottom: 0; margin-top: 0; padding-block: 0; }
+.cover-page { background: var(--accent); color: var(--accent-ink); min-height: 58vh; align-content: center; }
+.cover-page .cover-no {
+  font-family: var(--display); font-weight: 900; color: var(--mark);
+  font-size: clamp(90px, 26vw, 210px); line-height: 0.78; letter-spacing: -0.06em;
+}
+.cover-page h2 { font-size: clamp(30px, 7vw, 58px); }
+.cover-page .artist { color: inherit; opacity: 0.86; }
+.cover-page .rule { height: 3px; background: currentColor; opacity: 0.6; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .page.turn-fwd { animation: pageFwd 0.26s ease-out; }
+  .page.turn-back { animation: pageBack 0.26s ease-out; }
+  @keyframes pageFwd {
+    from { transform: perspective(1400px) rotateY(-9deg) translateX(26px); opacity: 0.3; }
+    to { transform: none; opacity: 1; }
+  }
+  @keyframes pageBack {
+    from { transform: perspective(1400px) rotateY(9deg) translateX(-26px); opacity: 0.3; }
+    to { transform: none; opacity: 1; }
+  }
+}
+
+/* ---------- forms ---------- */
+label.f { display: grid; gap: 5px; min-width: 0; }
+label.f > span { color: var(--ink-soft); }
+input[type="text"], input[type="url"], textarea, select {
+  font: inherit; width: 100%;
+  background: var(--paper-sunk); color: var(--ink);
+  border: 2px solid var(--ink); padding: 9px 11px;
+}
+textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } }
+.rate { display: flex; gap: 4px; }
+.rate button { width: 32px; height: 32px; border: 2px solid var(--accent); background: none; padding: 0; }
+.rate button[aria-pressed="true"] { background: var(--accent); }
+.picker { position: relative; }
+.results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 5;
+  background: var(--paper); border: 3px solid var(--ink);
+  max-height: 240px; overflow-y: auto;
+}
+.results button { display: flex; align-items: center; gap: 9px; width: 100%; background: none; border: 0; padding: 8px 11px; text-align: left; font-size: 14.5px; }
+.results button:hover, .results button:focus-visible { background: var(--paper-sunk); }
+.results img { width: 22px; height: 22px; border-radius: 0; }
+.note { color: var(--ink-soft); font-size: 13.5px; }
+.note.warn { color: var(--accent-ink); background: var(--accent); display: inline-block; padding: 4px 9px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+footer { border-top: 6px solid var(--accent); padding-block: 26px 40px; color: var(--ink-soft); display: grid; gap: 6px; }
+footer .mono { color: var(--accent); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet { animation: rise 0.18s ease-out; }
+  @keyframes rise { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<div class="bar">
+  <div class="wrap bar-in">
+    <button class="bar-mark" id="home">THE<em>·</em>MAG</button>
+    <div class="tabs mono" id="tabs"></div>
+    <button class="btn accent" id="open-composer">Submit</button>
+    <span class="me" id="me-chip"></span>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <header class="head">
+    <div class="plate mono" id="plate"></div>
+    <h1>The <em>Mag</em></h1>
+    <p class="dek">A music magazine put together by whoever shows up. Submit a song with your case for it, <b>tag the people who need to hear it</b>, and the whole pile goes out together as an issue.</p>
+    <div class="issue mono" id="issue"></div>
+  </header>
+
+  <div id="banner-slot"></div>
+  <div id="desk-slot"></div>
+  <nav id="toc-slot"></nav>
+  <section id="lead-slot"></section>
+
+  <div class="sect-head" id="sect-head">
+    <h2 class="mono" id="grid-title">Contents</h2>
+    <span class="rule"></span>
+    <span class="mono" id="grid-count"></span>
+  </div>
+  <div id="grid-slot"></div>
+
+  <footer>
+    <p class="mono">The Mag — a reader-run record column</p>
+    <p class="note" id="foot-note"></p>
+  </footer>
+</main>
+
+<section class="reader" id="reader" hidden aria-label="Issue reader"></section>
+<div class="scrim" id="scrim" hidden></div>
+<section class="sheet" id="sheet" hidden aria-label="Panel"></section>
+
+<script>
+(function () {
+  "use strict";
+
+  var REACTIONS = [
+    { k: "repeat", label: "On repeat" },
+    { k: "chills", label: "Chills" },
+    { k: "floor", label: "Floor filler" },
+    { k: "gut", label: "Gut punch" },
+    { k: "loud", label: "Play it loud" }
+  ];
+
+  var S = {
+    db: null, user: null,
+    me: { id: null, name: "", avatarUrl: "", canEdit: false, isOwner: false },
+    ready: false,
+    posts: [], comments: [], reactions: [], issues: [],
+    config: { cadence: "monthly" },
+    configVersionKnown: false,
+    profiles: {},
+    view: { kind: "current", id: null },
+    openId: null,
+    reader: null,           // null | { issueId, page, dir }
+    sheet: null,            // null | "post" | "compose"
+    draftTags: [],
+    confirmRelease: false,
+    writeBlocked: false,
+    error: ""
+  };
+
+  // ---------- helpers ----------
+  function h(tag, attrs, kids) {
+    var el = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        var v = attrs[k];
+        if (v === null || v === undefined || v === false) return;
+        if (k === "text") el.textContent = v;
+        else if (k === "class") el.className = v;
+        else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v);
+        else el.setAttribute(k, v === true ? "" : String(v));
+      });
+    }
+    (kids || []).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return el;
+  }
+  function fill(node, kids) {
+    node.textContent = "";
+    (kids || []).forEach(function (c) { if (c) node.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return node;
+  }
+  function pf(id) {
+    var p = S.profiles[id];
+    return { name: (p && p.name) || "Someone", avatarUrl: (p && p.avatarUrl) || "" };
+  }
+  // Seeded example entries carry a plain `byline` instead of a real account id.
+  function authorName(rec) {
+    if (rec && rec.byline) return rec.byline;
+    return pf(rec && rec.authorId).name;
+  }
+  function avatar(id, big) {
+    var p = pf(id);
+    var img = h("img", { class: "av" + (big ? " lg" : ""), alt: "" });
+    if (p.avatarUrl) img.src = p.avatarUrl;
+    return img;
+  }
+  function when(ts) {
+    if (!ts) return "";
+    var diff = (Date.now() - ts) / 1000;
+    if (diff < 60) return "just now";
+    if (diff < 3600) return Math.floor(diff / 60) + " min ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + " hr ago";
+    if (diff < 86400 * 6) return Math.floor(diff / 86400) + " days ago";
+    return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  }
+  function day(ts) {
+    if (!ts) return "";
+    return new Date(ts).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+  }
+  function countdown(ts) {
+    if (!ts) return "";
+    var ms = ts - Date.now();
+    if (ms <= 0) return "due now";
+    var d = Math.ceil(ms / 86400000);
+    if (d === 1) return "closes tomorrow";
+    if (d <= 31) return "closes in " + d + " days";
+    return "closes " + day(ts);
+  }
+  function dots(n) {
+    var box = h("span", { class: "dots", role: "img", "aria-label": n + " out of 5" });
+    for (var i = 1; i <= 5; i++) box.appendChild(h("span", { class: "dot" + (i <= n ? " on" : "") }));
+    return box;
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function dueFrom(from, cadence) {
+    var d = new Date(from);
+    if (cadence === "weekly") { d.setDate(d.getDate() + 7); }
+    else { d.setMonth(d.getMonth() + 1); }
+    d.setHours(9, 0, 0, 0);
+    return d.getTime();
+  }
+
+  // ---------- derived ----------
+  function openIssue() {
+    for (var i = 0; i < S.issues.length; i++) if (S.issues[i].status === "open") return S.issues[i];
+    return null;
+  }
+  function releasedIssues() {
+    return S.issues.filter(function (i) { return i.status === "released"; })
+      .sort(function (a, b) { return (b.number || 0) - (a.number || 0); });
+  }
+  function issueById(id) {
+    for (var i = 0; i < S.issues.length; i++) if (S.issues[i].id === id) return S.issues[i];
+    return null;
+  }
+  function postsIn(issueId) {
+    return S.posts.filter(function (p) { return p.issueId === issueId; });
+  }
+  function rxFor(postId) {
+    var out = {}, mine = null;
+    REACTIONS.forEach(function (r) { out[r.k] = 0; });
+    S.reactions.forEach(function (r) {
+      if (r.postId !== postId || out[r.kind] === undefined) return;
+      out[r.kind]++;
+      if (S.me.id && r.userId === S.me.id) mine = r.kind;
+    });
+    return { counts: out, mine: mine };
+  }
+  function rxTotal(postId) {
+    var c = rxFor(postId).counts, t = 0;
+    REACTIONS.forEach(function (r) { t += c[r.k]; });
+    return t;
+  }
+  function commentsFor(postId) { return S.comments.filter(function (c) { return c.postId === postId; }); }
+  function taggedForMe() {
+    if (!S.me.id) return [];
+    return S.posts.filter(function (p) { return (p.taggedIds || []).indexOf(S.me.id) > -1; });
+  }
+  function minePosts() {
+    if (!S.me.id) return [];
+    return S.posts.filter(function (p) { return p.authorId === S.me.id; });
+  }
+  function idsOnScreen() {
+    var set = {};
+    if (S.me.id) set[S.me.id] = 1;
+    S.posts.forEach(function (p) {
+      if (p.authorId) set[p.authorId] = 1;
+      (p.taggedIds || []).forEach(function (t) { set[t] = 1; });
+    });
+    S.comments.forEach(function (c) { if (c.authorId) set[c.authorId] = 1; });
+    S.draftTags.forEach(function (t) { set[t.id] = 1; });
+    S.issues.forEach(function (i) { if (i.releasedBy) set[i.releasedBy] = 1; });
+    return Object.keys(set);
+  }
+  function canWrite() { return !!S.db && !!S.me.id && !S.writeBlocked; }
+  function canSubmit() { return canWrite() && !!openIssue(); }
+  function nextIssueNumber() {
+    return S.issues.reduce(function (m, i) { return Math.max(m, i.number || 0); }, 0) + 1;
+  }
+
+  // ---------- render ----------
+  var pending = false;
+  function render() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(function () { pending = false; paint(); });
+  }
+  async function paint() {
+    if (S.user) {
+      var ids = idsOnScreen();
+      if (ids.length) { try { S.profiles = await S.user.profiles(ids); } catch (e) {} }
+    }
+    paintBar();
+    paintHead();
+    paintBanner();
+    paintDesk();
+    paintBody();
+    paintReader();
+    paintSheet();
+  }
+
+  function currentViewIssue() {
+    if (S.view.kind === "issue") return issueById(S.view.id);
+    return openIssue() || releasedIssues()[0] || null;
+  }
+
+  function paintBar() {
+    var open = openIssue();
+    var defs = [{ k: "current", t: open ? "Issue " + pad(open.number) : "This issue", n: open ? postsIn(open.id).length : 0 }];
+    defs.push({ k: "archive", t: "Back issues", n: releasedIssues().length });
+    if (S.me.id) {
+      defs.push({ k: "tagged", t: "Tagged you", n: taggedForMe().length });
+      defs.push({ k: "mine", t: "Yours", n: minePosts().length });
+    }
+    fill(document.getElementById("tabs"), defs.map(function (d) {
+      var on = (S.view.kind === d.k) || (d.k === "current" && S.view.kind === "issue" && open && S.view.id === open.id);
+      return h("button", {
+        class: "tab mono", "aria-pressed": on ? "true" : "false",
+        onclick: function () { S.view = { kind: d.k, id: null }; S.confirmRelease = false; window.scrollTo({ top: 0 }); render(); }
+      }, [d.t, h("span", { class: "n", text: String(d.n) })]);
+    }));
+
+    var chip = document.getElementById("me-chip");
+    if (S.me.id) fill(chip, [avatar(S.me.id, false), h("span", { class: "mono", text: S.me.name || "You" })]);
+    else fill(chip, [h("span", { class: "mono note", text: S.ready ? "Reading as a guest" : "Connecting…" })]);
+
+    document.getElementById("open-composer").disabled = !canSubmit();
+  }
+
+  function paintHead() {
+    var writers = {};
+    S.posts.forEach(function (p) { if (p.authorId) writers[p.authorId] = 1; });
+    S.comments.forEach(function (c) { if (c.authorId) writers[c.authorId] = 1; });
+    var rel = releasedIssues().length;
+    var now = new Date();
+    var shown = currentViewIssue();
+    fill(document.getElementById("plate"), [
+      h("span", { text: "Vol. 1" }),
+      h("span", { text: (S.config.cadence === "weekly" ? "Weekly" : "Monthly") + " edition" }),
+      h("span", { text: shown ? "Issue " + pad(shown.number) : "No issue yet" }),
+      h("span", { text: now.toLocaleDateString(undefined, { month: "long", year: "numeric" }) })
+    ]);
+    fill(document.getElementById("issue"), [
+      h("span", {}, [h("b", { text: String(rel) }), rel === 1 ? " issue out" : " issues out"]),
+      h("span", {}, [h("b", { text: String(S.posts.length) }), " songs submitted"]),
+      h("span", {}, [h("b", { text: String(S.comments.length) }), " responses"]),
+      h("span", {}, [h("b", { text: String(Object.keys(writers).length) }), " contributors"]),
+      h("span", { text: S.config.cadence === "weekly" ? "Weekly" : "Monthly" })
+    ]);
+    document.getElementById("foot-note").textContent = S.error
+      ? S.error
+      : "Anyone with access can submit a song, respond, react and tag colleagues. Opening and releasing issues is for editors.";
+  }
+
+  function paintBanner() {
+    var slot = document.getElementById("banner-slot");
+    var iss = currentViewIssue();
+    if (!iss) {
+      if (S.view.kind === "archive" || S.view.kind === "tagged" || S.view.kind === "mine") { fill(slot, []); return; }
+      var mayOpen = canWrite() && S.me.canEdit;
+      fill(slot, [h("div", { class: "banner" }, [
+        h("div", { class: "grow" }, [
+          h("span", { class: "mono kicker", text: "No issue open" }),
+          h("h2", { text: "Issue " + pad(nextIssueNumber()) + " hasn't been opened yet" }),
+          h("p", {
+            text: mayOpen
+              ? "Open it and submissions can start landing. It stays open until you release it."
+              : "An editor opens the next issue. Submissions can land as soon as they do."
+          })
+        ]),
+        mayOpen ? h("button", { class: "btn accent", onclick: openNewIssue }, ["Open issue " + pad(nextIssueNumber())]) : null
+      ])]);
+      return;
+    }
+    var n = postsIn(iss.id).length;
+    var isOpen = iss.status === "open";
+    fill(slot, [h("div", { class: "banner" + (isOpen ? "" : " out") }, [
+      h("div", { class: "grow" }, [
+        h("span", { class: "mono kicker", text: (iss.example ? "Example issue · " : "") + (isOpen ? "Open for submissions" : "Released " + day(iss.releasedAt)) }),
+        h("h2", { text: "Issue " + pad(iss.number) }),
+        h("p", {
+          text: isOpen
+            ? n + (n === 1 ? " song in so far · " : " songs in so far · ") + (countdown(iss.dueAt) || "no close date set")
+            : n + (n === 1 ? " song" : " songs") + ((iss.releasedBy || iss.byline) ? " · put out by " + authorName(iss) : "")
+        }),
+        iss.example ? h("p", { text: "Sample content, here to show the shape of an issue. Delete it whenever you like." }) : null
+      ]),
+      n ? h("button", { class: "btn", onclick: function () { openReader(iss.id, 0); } }, ["Read the issue"]) : null,
+      isOpen && canSubmit() ? h("button", { class: "btn accent", onclick: openComposer }, ["Add yours"]) : null
+    ])]);
+  }
+
+  function paintDesk() {
+    var slot = document.getElementById("desk-slot");
+    var iss = openIssue();
+    if (!S.me.canEdit || !canWrite() || S.view.kind === "archive") { fill(slot, []); return; }
+    var n = iss ? postsIn(iss.id).length : 0;
+    fill(slot, [h("div", { class: "banner desk" }, [
+      h("div", { class: "grow" }, [
+        h("span", { class: "mono kicker", text: "Editor's desk" }),
+        h("p", {
+          text: iss
+            ? "Issue " + pad(iss.number) + " has " + n + (n === 1 ? " song" : " songs") + ". Releasing it closes submissions, picks the cover story and opens the next issue."
+            : "No issue is open, so nobody can submit. Opening one starts the cycle again."
+        })
+      ]),
+      h("div", { class: "actions" }, [
+        h("div", { class: "seg" }, [
+          h("button", { "aria-pressed": S.config.cadence === "weekly" ? "true" : "false", onclick: function () { setCadence("weekly"); } }, ["Weekly"]),
+          h("button", { "aria-pressed": S.config.cadence === "monthly" ? "true" : "false", onclick: function () { setCadence("monthly"); } }, ["Monthly"])
+        ]),
+        !iss ? h("button", { class: "btn accent", onclick: openNewIssue }, ["Open issue " + pad(nextIssueNumber())]) : null,
+        iss && n
+          ? (S.confirmRelease
+              ? h("span", { class: "actions" }, [
+                  h("button", { class: "btn accent", onclick: function () { releaseIssue(iss); } }, ["Yes, release it"]),
+                  h("button", { class: "btn ghost small", onclick: function () { S.confirmRelease = false; render(); } }, ["Cancel"])
+                ])
+              : h("button", { class: "btn", onclick: function () { S.confirmRelease = true; render(); } }, ["Release issue " + pad(iss.number)]))
+          : null
+      ])
+    ])]);
+  }
+
+  function paintBody() {
+    var tocSlot = fill(document.getElementById("toc-slot"), []);
+    var leadSlot = document.getElementById("lead-slot");
+    var gridSlot = document.getElementById("grid-slot");
+    var sect = document.getElementById("sect-head");
+    var title = document.getElementById("grid-title");
+    var count = document.getElementById("grid-count");
+
+    if (S.view.kind === "archive") {
+      fill(leadSlot, []);
+      sect.hidden = false;
+      title.textContent = "Back issues";
+      count.textContent = "";
+      var rel = releasedIssues();
+      if (!rel.length) {
+        fill(gridSlot, [h("div", { class: "empty" }, [
+          h("span", { class: "mono kicker", text: "Nothing out yet" }),
+          h("h3", { text: "No issue has been released" }),
+          h("p", { text: "Once the open issue goes out it lands on this shelf, with its cover story and everything in it." })
+        ])]);
+        return;
+      }
+      fill(gridSlot, [h("div", { class: "shelf" }, rel.map(function (iss) {
+        var n = postsIn(iss.id).length;
+        return h("button", { onclick: function () { S.view = { kind: "issue", id: iss.id }; window.scrollTo({ top: 0 }); render(); } }, [
+          h("span", { class: "no", text: pad(iss.number) }),
+          h("span", { class: "ttl" }, [
+            h("b", { text: coverOf(iss.id) ? coverOf(iss.id).title + " — " + coverOf(iss.id).artist : "Empty issue" }),
+            h("div", { class: "mono note", text: n + (n === 1 ? " song" : " songs") + " · out " + day(iss.releasedAt) + (iss.example ? " · example" : "") })
+          ]),
+          h("span", { class: "mono filed", text: "Read" })
+        ]);
+      }))]);
+      return;
+    }
+
+    var list, kicker;
+    if (S.view.kind === "tagged") { list = taggedForMe(); kicker = "Tagged for you"; }
+    else if (S.view.kind === "mine") { list = minePosts(); kicker = "Your submissions"; }
+    else {
+      var iss = currentViewIssue();
+      list = iss ? postsIn(iss.id) : [];
+      kicker = iss && iss.status === "open" ? "In the works" : "Contents";
+    }
+    list = list.slice().sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+
+    var issNow = currentViewIssue();
+    var showCover = S.view.kind === "issue" || (S.view.kind === "current" && issNow && issNow.status === "released");
+    var cover = showCover && issNow ? coverOf(issNow.id) : null;
+
+    if (!list.length) {
+      fill(leadSlot, []);
+      sect.hidden = true;
+      fill(gridSlot, [emptyState()]);
+      return;
+    }
+
+    sect.hidden = false;
+    if (cover) {
+      fill(leadSlot, [leadCard(cover)]);
+      list = list.filter(function (p) { return p.id !== cover.id; });
+    } else {
+      fill(leadSlot, []);
+    }
+
+    var ordered = cover ? [cover].concat(list) : list;
+    if (S.view.kind !== "tagged" && S.view.kind !== "mine" && ordered.length > 1) {
+      fill(tocSlot, [contentsList(ordered, issNow)]);
+    }
+
+    title.textContent = kicker;
+    count.textContent = list.length ? list.length + (list.length === 1 ? " entry" : " entries") : "";
+    if (!list.length) {
+      fill(gridSlot, [h("p", { class: "note", style: "padding-bottom:44px", text: "That's the whole issue." })]);
+      return;
+    }
+    var offset = cover ? 2 : 1;
+    fill(gridSlot, [h("div", { class: "grid" }, list.map(function (p, i) { return card(p, i + offset); }))]);
+  }
+
+  function orderedFor(issueId) {
+    var list = postsIn(issueId).slice().sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    var cover = coverOf(issueId);
+    if (cover) list = [cover].concat(list.filter(function (p) { return p.id !== cover.id; }));
+    return list;
+  }
+
+  function contentsList(ordered, iss, onPick) {
+    return h("div", { class: "toc" }, [
+      h("div", { class: "toc-head mono" }, [
+        h("span", { text: iss ? "In issue " + pad(iss.number) : "In this issue" }),
+        h("span", { class: "rule" }),
+        h("span", { class: "pg", text: ordered.length + " entries" })
+      ])
+    ].concat(ordered.map(function (p, i) {
+      return h("button", { onclick: function () { if (onPick) onPick(i); else openPost(p.id); } }, [
+        h("span", { class: "no", text: pad(i + 1) }),
+        h("span", { class: "t", text: p.title || "Untitled" }),
+        h("span", { class: "a", text: p.artist || "Unknown artist" }),
+        h("span", { class: "leader" }),
+        h("span", { class: "pg mono", text: p.genre || "unfiled" })
+      ]);
+    })));
+  }
+
+  function coverOf(issueId) {
+    var ps = postsIn(issueId);
+    if (!ps.length) return null;
+    var best = null, bestScore = -1;
+    ps.forEach(function (p) {
+      var score = rxTotal(p.id) * 10 + (p.rating || 0);
+      if (score > bestScore || (score === bestScore && best && (p.createdAt || 0) > (best.createdAt || 0))) {
+        best = p; bestScore = score;
+      }
+    });
+    return best;
+  }
+
+  function emptyState() {
+    var k = S.view.kind;
+    if (k === "tagged") {
+      return h("div", { class: "empty" }, [
+        h("span", { class: "mono kicker", text: "Nothing yet" }),
+        h("h3", { text: "Nobody has tagged you in a song" }),
+        h("p", { text: "When someone submits a song and tags you, it shows up here before the issue goes out." })
+      ]);
+    }
+    if (k === "mine") {
+      return h("div", { class: "empty" }, [
+        h("span", { class: "mono kicker", text: "Your desk is clear" }),
+        h("h3", { text: "You haven't submitted anything" }),
+        h("p", { text: "A submission is a song, a rating and a short case for it. It goes into the open issue." }),
+        canSubmit() ? h("button", { class: "btn accent", onclick: openComposer }, ["Submit a song"]) : null
+      ]);
+    }
+    var iss = currentViewIssue();
+    return h("div", { class: "empty" }, [
+      h("span", { class: "mono kicker", text: iss ? "Issue " + pad(iss.number) : "First issue" }),
+      h("h3", { text: "This issue is empty so far" }),
+      h("p", { text: "Submissions collect here until the issue is released. The song with the strongest reaction runs as the cover story." }),
+      canSubmit()
+        ? h("button", { class: "btn accent", onclick: openComposer }, ["Submit the first song"])
+        : h("p", { class: "note", text: canWrite() ? "Submissions open when an editor opens the next issue." : "Sign in to claude.ai to submit, respond or react." })
+    ]);
+  }
+
+  function leadCard(p) {
+    var cs = commentsFor(p.id).length, total = rxTotal(p.id);
+    var youTagged = S.me.id && (p.taggedIds || []).indexOf(S.me.id) > -1;
+    return h("article", { class: "lead" }, [
+      h("div", {}, [
+        h("span", { class: "mono kicker", text: "Cover story · 01" }),
+        h("h2", { text: p.title || "Untitled" }),
+        h("div", { class: "artist", text: p.artist || "Unknown artist" })
+      ]),
+      h("p", { class: "pull", text: firstLine(p.review) }),
+      restParagraphs(p.review).length
+        ? h("div", { class: "cols" }, restParagraphs(p.review).map(function (para) { return h("p", { text: para }); }))
+        : null,
+      h("div", { class: "lead-foot" }, [
+        avatar(p.authorId, true),
+        h("span", { class: "mono" }, ["By ", h("b", { text: authorName(p) })]),
+        dots(p.rating || 0),
+        p.genre ? h("span", { class: "mono filed", text: "Filed under " + p.genre }) : null,
+        youTagged ? h("span", { class: "mono tagged-flag", text: "Tagged you" }) : null,
+        h("span", { class: "mono note", text: cs + (cs === 1 ? " response" : " responses") + " · " + total + " reactions" }),
+        h("button", { class: "btn ghost", onclick: function () { openPost(p.id); } }, ["Read the review"])
+      ])
+    ]);
+  }
+
+  function card(p, no) {
+    var total = rxTotal(p.id);
+    var youTagged = S.me.id && (p.taggedIds || []).indexOf(S.me.id) > -1;
+    var iss = issueById(p.issueId);
+    return h("button", { class: "card", onclick: function () { openPost(p.id); } }, [
+      h("div", { class: "ftop" }, [
+        h("span", { class: "mono filed", text: p.genre || "Unfiled" }),
+        no ? h("span", { class: "folio", text: pad(no) }) : null
+      ]),
+      h("h3", { text: p.title || "Untitled" }),
+      h("div", { class: "artist", text: p.artist || "Unknown artist" }),
+      dots(p.rating || 0),
+      h("p", { class: "excerpt", text: p.review || "" }),
+      h("div", { class: "card-foot mono" }, [
+        avatar(p.authorId, false),
+        h("span", { text: authorName(p) }),
+        h("span", { text: "·" }),
+        h("span", { text: when(p.createdAt) }),
+        (S.view.kind === "tagged" || S.view.kind === "mine") && iss ? h("span", { text: "· Issue " + pad(iss.number) }) : null,
+        youTagged ? h("span", { class: "tagged-flag", text: "Tagged you" }) : null,
+        total ? h("span", { text: "· " + total + " reactions" }) : null
+      ])
+    ]);
+  }
+
+  function firstLine(t) {
+    var s = (t || "").trim().split(/\n/)[0];
+    return s.length > 220 ? s.slice(0, 217) + "…" : s;
+  }
+  function restParagraphs(t) {
+    var s = (t || "").trim();
+    var i = s.indexOf("\n");
+    if (i < 0) return [];
+    return s.slice(i + 1).split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+
+  // ---------- reader ----------
+  function allParagraphs(t) {
+    return (t || "").trim().split(/\n{2,}|\n/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+  function openReader(issueId, page) {
+    S.reader = { issueId: issueId, page: page || 0, dir: 1, animate: true };
+    render();
+  }
+  function closeReader() { S.reader = null; render(); }
+  function turnPage(delta) {
+    if (!S.reader) return;
+    var iss = issueById(S.reader.issueId);
+    if (!iss) { closeReader(); return; }
+    var total = orderedFor(iss.id).length + 3;
+    var next = S.reader.page + delta;
+    if (next < 0 || next >= total) return;
+    S.reader.page = next;
+    S.reader.dir = delta;
+    S.reader.animate = true;
+    render();
+  }
+  function goToPage(n) {
+    if (!S.reader) return;
+    S.reader.dir = n >= S.reader.page ? 1 : -1;
+    S.reader.page = n;
+    S.reader.animate = true;
+    render();
+  }
+
+  function paintReader() {
+    var el = document.getElementById("reader");
+    if (!S.reader) {
+      el.hidden = true;
+      if (!S.sheet) document.body.style.overflow = "";
+      return;
+    }
+    var iss = issueById(S.reader.issueId);
+    if (!iss) { el.hidden = true; S.reader = null; return; }
+    el.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    var entries = orderedFor(iss.id);
+    var total = entries.length + 3;
+    if (S.reader.page >= total) S.reader.page = total - 1;
+    var idx = S.reader.page;
+
+    var page;
+    if (idx === 0) page = coverPage(iss, entries);
+    else if (idx === 1) page = contentsPage(iss, entries);
+    else if (idx < entries.length + 2) page = entryPage(iss, entries[idx - 2], idx - 1);
+    else page = endPage(iss, entries);
+    if (S.reader.animate) {
+      page.className += S.reader.dir < 0 ? " turn-back" : " turn-fwd";
+      S.reader.animate = false;
+    }
+
+    var stage = h("div", { class: "reader-stage" }, [page]);
+    var touchX = null;
+    stage.addEventListener("touchstart", function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (touchX === null) return;
+      var dx = e.changedTouches[0].clientX - touchX;
+      touchX = null;
+      if (Math.abs(dx) > 60) turnPage(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
+    fill(el, [
+      h("div", { class: "reader-bar" }, [
+        h("span", { class: "mono grow", text: "The Mag · Issue " + pad(iss.number) + (iss.example ? " · example" : "") }),
+        h("button", { class: "btn small", onclick: closeReader }, ["Close"])
+      ]),
+      stage,
+      h("div", { class: "reader-foot" }, [
+        h("button", { class: "btn ghost small", disabled: idx === 0, onclick: function () { turnPage(-1); } }, ["← Back"]),
+        h("span", { class: "mono folio", text: "Page " + (idx + 1) + " of " + total }),
+        h("button", { class: "btn small", disabled: idx === total - 1, onclick: function () { turnPage(1); } }, ["Next →"])
+      ])
+    ]);
+  }
+
+  function coverPage(iss, entries) {
+    var cover = entries[0];
+    return h("div", { class: "page cover-page" }, [
+      h("div", { class: "mono", text: "The Mag · Vol. 1 · " + (iss.cadence === "weekly" ? "Weekly" : "Monthly") }),
+      h("div", { class: "cover-no", text: pad(iss.number) }),
+      h("div", { class: "rule" }),
+      cover ? h("h2", { text: cover.title }) : h("h2", { text: "Nothing in this issue" }),
+      cover ? h("div", { class: "artist", text: cover.artist }) : null,
+      h("p", { class: "mono", text: entries.length + (entries.length === 1 ? " entry" : " entries") + " · " + (iss.status === "released" ? "out " + day(iss.releasedAt) : "still open") })
+    ]);
+  }
+
+  function contentsPage(iss, entries) {
+    return h("div", { class: "page" }, [
+      h("div", { class: "page-head mono" }, [
+        h("span", { text: "Issue " + pad(iss.number) }),
+        h("span", { text: "Contents" })
+      ]),
+      h("h2", { text: "Contents" }),
+      entries.length
+        ? contentsList(entries, iss, function (i) { goToPage(i + 2); })
+        : h("p", { class: "note", text: "This issue is empty." })
+    ]);
+  }
+
+  function entryPage(iss, p, no) {
+    var rx = rxFor(p.id), cs = commentsFor(p.id).length;
+    var hit = REACTIONS.filter(function (r) { return rx.counts[r.k] > 0; });
+    return h("div", { class: "page" }, [
+      h("div", { class: "page-head mono" }, [
+        h("span", { text: "Issue " + pad(iss.number) + " · " + (p.genre || "unfiled") }),
+        h("span", { text: "Entry " + pad(no) })
+      ]),
+      h("h2", { text: p.title || "Untitled" }),
+      h("div", { class: "artist", text: p.artist || "Unknown artist" }),
+      h("div", { class: "byline" }, [dots(p.rating || 0), h("span", { class: "mono", text: "by " + authorName(p) })]),
+      h("div", { class: "cols" }, allParagraphs(p.review).map(function (para) { return h("p", { text: para }); })),
+      p.link ? h("p", {}, [h("a", { href: p.link, target: "_blank", rel: "noopener noreferrer", text: "Listen to it" })]) : null,
+      h("div", { class: "page-foot" }, [
+        hit.length
+          ? h("span", { class: "mono note", text: hit.map(function (r) { return r.label.toLowerCase() + " " + rx.counts[r.k]; }).join(" · ") })
+          : h("span", { class: "mono note", text: "No reactions yet" }),
+        h("span", { class: "mono note", text: cs + (cs === 1 ? " response" : " responses") }),
+        h("button", { class: "btn ghost small", onclick: function () { openPost(p.id); } }, ["React or respond"])
+      ])
+    ]);
+  }
+
+  function endPage(iss, entries) {
+    var responses = 0, reactions = 0;
+    entries.forEach(function (p) { responses += commentsFor(p.id).length; reactions += rxTotal(p.id); });
+    var older = releasedIssues().filter(function (x) { return (x.number || 0) < (iss.number || 0); })[0];
+    return h("div", { class: "page" }, [
+      h("div", { class: "page-head mono" }, [
+        h("span", { text: "Issue " + pad(iss.number) }),
+        h("span", { text: "Colophon" })
+      ]),
+      h("h2", { text: "End of issue " + pad(iss.number) }),
+      h("p", { class: "note", text: entries.length + (entries.length === 1 ? " song" : " songs") + ", " + responses + (responses === 1 ? " response" : " responses") + " and " + reactions + " reactions, filed by whoever showed up." }),
+      h("div", { class: "page-foot" }, [
+        h("button", { class: "btn", onclick: function () { goToPage(0); } }, ["Back to the cover"]),
+        older ? h("button", { class: "btn ghost", onclick: function () { openReader(older.id, 0); } }, ["Read issue " + pad(older.number)]) : null,
+        h("button", { class: "btn ghost", onclick: closeReader }, ["Close the issue"])
+      ])
+    ]);
+  }
+
+  // ---------- sheets ----------
+  function closeSheet() { S.sheet = null; S.openId = null; render(); }
+  function openPost(id) { S.sheet = "post"; S.openId = id; render(); }
+  function openComposer() {
+    if (!canSubmit()) return;
+    S.sheet = "compose"; S.draftTags = []; S.error = "";
+    render();
+  }
+
+  function paintSheet() {
+    var sheet = document.getElementById("sheet");
+    var scrim = document.getElementById("scrim");
+    if (!S.sheet) {
+      sheet.hidden = true; scrim.hidden = true;
+      document.body.style.overflow = S.reader ? "hidden" : "";
+      return;
+    }
+    scrim.hidden = false; sheet.hidden = false;
+    document.body.style.overflow = "hidden";
+    if (S.sheet === "compose") paintComposer(sheet);
+    else paintPost(sheet);
+  }
+
+  function sheetBar(label) {
+    return h("div", { class: "sheet-bar" }, [
+      h("div", { class: "wrap", style: "display:flex;align-items:center;gap:10px;width:100%" }, [
+        h("span", { class: "mono kicker", style: "margin-right:auto", text: label }),
+        h("button", { class: "btn ghost", onclick: closeSheet }, ["Close"])
+      ])
+    ]);
+  }
+
+  function paintPost(sheet) {
+    var p = S.posts.filter(function (x) { return x.id === S.openId; })[0];
+    if (!p) { closeSheet(); return; }
+    var rx = rxFor(p.id), cs = commentsFor(p.id), iss = issueById(p.issueId);
+    var writable = canWrite();
+    var tagged = p.taggedIds || [];
+
+    var body = h("div", { class: "wrap sheet-body" }, [
+      h("div", {}, [
+        h("span", { class: "mono filed", text: (iss ? "Issue " + pad(iss.number) + " · " : "") + (p.genre || "Unfiled") }),
+        h("h2", { text: p.title || "Untitled" }),
+        h("div", { style: "font-family:var(--display);font-style:italic;font-size:20px;color:var(--ink-soft)", text: p.artist || "Unknown artist" })
+      ]),
+      h("div", { class: "byline" }, [
+        avatar(p.authorId, true),
+        h("span", {}, [h("b", { text: authorName(p) }), " · ", when(p.createdAt)]),
+        dots(p.rating || 0)
+      ]),
+      p.link ? h("p", {}, [h("a", { href: p.link, target: "_blank", rel: "noopener noreferrer", text: "Listen to it" })]) : null,
+      h("p", { class: "review", text: p.review || "" }),
+
+      h("div", { class: "block" }, [
+        h("span", { class: "mono", text: "Reactions" }),
+        h("div", { class: "chips" }, REACTIONS.map(function (r) {
+          var on = rx.mine === r.k;
+          return h("button", {
+            class: "rx", "aria-pressed": on ? "true" : "false", disabled: !writable,
+            onclick: function () { toggleReaction(p.id, r.k, on); }
+          }, [r.label, h("span", { class: "n", text: String(rx.counts[r.k]) })]);
+        })),
+        iss && iss.status === "open" ? h("p", { class: "note", text: "Reactions decide which song runs as the cover of this issue." }) : null,
+        !writable ? h("p", { class: "note", text: "Sign in with an account that can write here to react." }) : null
+      ]),
+
+      h("div", { class: "block" }, [
+        h("span", { class: "mono", text: "Tagged — people who might like this" }),
+        tagged.length
+          ? h("div", { class: "chips" }, tagged.map(function (id) {
+              var pr = pf(id);
+              return h("span", { class: "person" }, [
+                h("img", { src: pr.avatarUrl, alt: "" }),
+                h("span", { text: pr.name }),
+                id === S.me.id ? h("span", { class: "mono", style: "color:var(--accent)", text: "you" }) : null
+              ]);
+            }))
+          : h("p", { class: "note", text: "Nobody tagged yet." }),
+        writable ? tagAdder(p) : null
+      ]),
+
+      h("div", { class: "block" }, [
+        h("span", { class: "mono", text: cs.length + (cs.length === 1 ? " response" : " responses") }),
+        h("div", {}, cs.map(function (c) {
+          return h("div", { class: "cmt" }, [
+            avatar(c.authorId, false),
+            h("div", { class: "body" }, [
+              h("div", { class: "who" }, [
+                h("b", { text: authorName(c) }),
+                h("span", { class: "mono note", text: when(c.createdAt) })
+              ]),
+              h("p", { text: c.body })
+            ])
+          ]);
+        })),
+        writable ? commentBox(p) : h("p", { class: "note", text: "Sign in to leave a response." })
+      ]),
+
+      S.me.id && p.authorId === S.me.id && writable
+        ? h("div", { class: "block" }, [
+            h("div", { class: "actions" }, [
+              h("button", { class: "btn ghost", onclick: function () { removePost(p); } }, ["Pull this submission"]),
+              h("span", { class: "note", text: "Removes it from the issue, responses and all." })
+            ])
+          ])
+        : null,
+
+      S.error ? h("p", { class: "note warn", text: S.error }) : null
+    ]);
+
+    fill(sheet, [sheetBar("Review"), body]);
+  }
+
+  function commentBox(p) {
+    var ta = h("textarea", { id: "c-body-" + p.id, placeholder: "What did it do to you?", style: "min-height:88px" });
+    var btn = h("button", { class: "btn accent" }, ["Post response"]);
+    btn.addEventListener("click", function () {
+      var v = ta.value.trim();
+      if (!v) return;
+      btn.disabled = true;
+      addComment(p.id, v).then(function (ok) { btn.disabled = false; if (ok) ta.value = ""; });
+    });
+    return h("div", { style: "display:grid;gap:8px" }, [ta, h("div", { class: "actions" }, [btn])]);
+  }
+
+  function tagAdder(p) {
+    var input = h("input", { type: "text", id: "tag-" + p.id, placeholder: "Tag someone who'd like this…", autocomplete: "off" });
+    var results = h("div", { class: "results", hidden: true });
+    function run(q) {
+      if (!S.user || !S.user.search) return;
+      S.user.search(q).then(function (hits) {
+        var already = p.taggedIds || [];
+        var list = hits.filter(function (x) { return already.indexOf(x.id) < 0; });
+        if (!list.length) { results.hidden = true; return; }
+        fill(results, list.map(function (hit) {
+          return h("button", { type: "button", onclick: function () { input.value = ""; results.hidden = true; addTag(p, hit.id); } },
+            [h("img", { src: hit.avatarUrl, alt: "" }), h("span", { text: hit.name })]);
+        }));
+        results.hidden = false;
+      });
+    }
+    input.addEventListener("focus", function () { run(""); });
+    input.addEventListener("input", function () { run(input.value); });
+    input.addEventListener("blur", function () { setTimeout(function () { results.hidden = true; }, 160); });
+    return h("div", { class: "picker" }, [input, results]);
+  }
+
+  function paintComposer(sheet) {
+    var iss = openIssue();
+    var nextNo = iss ? iss.number : (S.issues.reduce(function (m, i) { return Math.max(m, i.number || 0); }, 0) + 1);
+
+    var title = h("input", { type: "text", id: "f-title", placeholder: "Song title", autocomplete: "off" });
+    var artist = h("input", { type: "text", id: "f-artist", placeholder: "Artist", autocomplete: "off" });
+    var genre = h("input", { type: "text", id: "f-genre", placeholder: "e.g. slowcore, amapiano, 70s soul", autocomplete: "off" });
+    var link = h("input", { type: "url", id: "f-link", placeholder: "https://… (optional)", autocomplete: "off" });
+    var review = h("textarea", { id: "f-review", placeholder: "Make the case. What happens in the first thirty seconds? Who should hear it and when?" });
+
+    var rating = 4;
+    var rateRow = h("div", { class: "rate" });
+    function paintRate() {
+      fill(rateRow, [1, 2, 3, 4, 5].map(function (n) {
+        return h("button", {
+          type: "button", "aria-pressed": n <= rating ? "true" : "false", "aria-label": n + " out of 5",
+          onclick: function () { rating = n; paintRate(); }
+        });
+      }));
+    }
+    paintRate();
+
+    var chipRow = h("div", { class: "chips" });
+    var tagInput = h("input", { type: "text", id: "f-tag", placeholder: "Search a colleague by name…", autocomplete: "off" });
+    var results = h("div", { class: "results", hidden: true });
+
+    function paintChips() {
+      fill(chipRow, S.draftTags.length
+        ? S.draftTags.map(function (t) {
+            return h("span", { class: "person" }, [
+              h("img", { src: t.avatarUrl, alt: "" }),
+              h("span", { text: t.name }),
+              h("button", { type: "button", "aria-label": "Remove " + t.name, onclick: function () {
+                S.draftTags = S.draftTags.filter(function (x) { return x.id !== t.id; });
+                paintChips();
+              } }, ["×"])
+            ]);
+          })
+        : [h("span", { class: "note", text: "Optional — but tagging is how a song finds the right person when the issue lands." })]);
+    }
+    paintChips();
+
+    function runSearch(q) {
+      if (!S.user || !S.user.search) { results.hidden = true; return; }
+      S.user.search(q).then(function (hits) {
+        var picked = S.draftTags.map(function (t) { return t.id; });
+        var list = hits.filter(function (x) { return picked.indexOf(x.id) < 0; });
+        if (!list.length) { results.hidden = true; return; }
+        fill(results, list.map(function (hit) {
+          return h("button", { type: "button", onclick: function () {
+            S.draftTags.push({ id: hit.id, name: hit.name, avatarUrl: hit.avatarUrl });
+            tagInput.value = ""; results.hidden = true; paintChips();
+          } }, [h("img", { src: hit.avatarUrl, alt: "" }), h("span", { text: hit.name })]);
+        }));
+        results.hidden = false;
+      });
+    }
+    tagInput.addEventListener("focus", function () { runSearch(""); });
+    tagInput.addEventListener("input", function () { runSearch(tagInput.value); });
+    tagInput.addEventListener("blur", function () { setTimeout(function () { results.hidden = true; }, 160); });
+
+    var msg = h("p", { class: "note" });
+    var submit = h("button", { class: "btn accent" }, ["Add to issue " + pad(nextNo)]);
+    submit.addEventListener("click", function () {
+      if (!title.value.trim() || !artist.value.trim() || !review.value.trim()) {
+        msg.className = "note warn";
+        msg.textContent = "A submission needs a song title, an artist and a review.";
+        return;
+      }
+      submit.disabled = true;
+      msg.className = "note";
+      msg.textContent = "Filing…";
+      createPost({
+        title: title.value.trim(),
+        artist: artist.value.trim(),
+        genre: genre.value.trim(),
+        link: link.value.trim(),
+        review: review.value.trim(),
+        rating: rating,
+        taggedIds: S.draftTags.map(function (t) { return t.id; })
+      }).then(function (ok) {
+        submit.disabled = false;
+        if (ok) closeSheet();
+        else { msg.className = "note warn"; msg.textContent = S.error || "That submission did not save."; }
+      });
+    });
+
+    var deadline = iss && iss.dueAt
+      ? "Issue " + pad(nextNo) + " " + countdown(iss.dueAt) + " and goes out when an editor releases it."
+      : "This opens Issue " + pad(nextNo) + ", running " + (S.config.cadence === "weekly" ? "weekly" : "monthly") + ".";
+
+    var body = h("div", { class: "wrap sheet-body" }, [
+      h("div", {}, [
+        h("span", { class: "mono kicker", text: "Submission" }),
+        h("h2", { text: "Put a song in issue " + pad(nextNo) }),
+        h("p", { class: "note", style: "margin-top:6px", text: deadline })
+      ]),
+      h("div", { class: "row2" }, [
+        h("label", { class: "f" }, [h("span", { class: "mono", text: "Song" }), title]),
+        h("label", { class: "f" }, [h("span", { class: "mono", text: "Artist" }), artist])
+      ]),
+      h("div", { class: "row2" }, [
+        h("label", { class: "f" }, [h("span", { class: "mono", text: "Filed under" }), genre]),
+        h("label", { class: "f" }, [h("span", { class: "mono", text: "Link" }), link])
+      ]),
+      h("label", { class: "f" }, [h("span", { class: "mono", text: "Rating" }), rateRow]),
+      h("label", { class: "f" }, [h("span", { class: "mono", text: "The review" }), review]),
+      h("div", { class: "f" }, [
+        h("span", { class: "mono", text: "Tag people who might like it" }),
+        h("div", { class: "picker" }, [tagInput, results]),
+        chipRow
+      ]),
+      h("div", { class: "actions" }, [submit, h("button", { class: "btn ghost", onclick: closeSheet }, ["Cancel"]), msg])
+    ]);
+
+    fill(sheet, [sheetBar("Submit"), body]);
+    setTimeout(function () { title.focus(); }, 30);
+  }
+
+  // ---------- writes ----------
+  function handleWriteError(e) {
+    var code = e && e.code;
+    if (code === "invalid_argument") {
+      S.writeBlocked = true;
+      S.error = "Your access to this page is read-only, so that didn't save.";
+    } else if (code === "quota_exceeded") {
+      S.error = "The Mag has hit its storage limit. Pull some old submissions to make room.";
+    } else if (code === "resource_exhausted") {
+      S.error = "Too many writes at once. Give it a second and try again.";
+    } else {
+      S.error = "That didn't save. Try again in a moment.";
+    }
+    render();
+  }
+
+  async function openNewIssue() {
+    if (!canWrite() || !S.me.canEdit) return null;
+    var next = nextIssueNumber();
+    var now = Date.now();
+    try {
+      await S.db.doc("issues/i" + next).set({
+        number: next,
+        status: "open",
+        cadence: S.config.cadence,
+        openedAt: now,
+        dueAt: dueFrom(now, S.config.cadence)
+      });
+      S.error = "";
+      S.view = { kind: "current", id: null };
+      render();
+    } catch (e) { handleWriteError(e); }
+  }
+
+  async function createPost(data) {
+    if (!canWrite()) return false;
+    var iss = openIssue();
+    if (!iss) {
+      S.error = "No issue is open right now. An editor has to open one before submissions can land.";
+      render();
+      return false;
+    }
+    try {
+      data.issueId = iss.id;
+      data.authorId = S.me.id;
+      data.createdAt = Date.now();
+      await S.db.collection("posts").add(data);
+      S.error = "";
+      S.view = { kind: "current", id: null };
+      return true;
+    } catch (e) { handleWriteError(e); return false; }
+  }
+
+  async function addComment(postId, body) {
+    if (!canWrite()) return false;
+    try {
+      await S.db.collection("comments").add({ postId: postId, authorId: S.me.id, body: body, createdAt: Date.now() });
+      S.error = "";
+      return true;
+    } catch (e) { handleWriteError(e); return false; }
+  }
+
+  async function toggleReaction(postId, kind, on) {
+    if (!canWrite()) return;
+    var ref = S.db.collection("reactions").doc(postId + ":" + S.me.id);
+    try {
+      if (on) await ref.delete();
+      else await ref.set({ postId: postId, userId: S.me.id, kind: kind, at: Date.now() });
+      S.error = "";
+    } catch (e) { handleWriteError(e); }
+  }
+
+  async function addTag(post, personId) {
+    if (!canWrite()) return;
+    var next = (post.taggedIds || []).slice();
+    if (next.indexOf(personId) > -1) return;
+    next.push(personId);
+    try {
+      await S.db.doc("posts/" + post.id).update({ taggedIds: next });
+      S.error = "";
+    } catch (e) { handleWriteError(e); }
+  }
+
+  async function removePost(post) {
+    if (!canWrite()) return;
+    try {
+      await S.db.doc("posts/" + post.id).delete();
+      var kids = commentsFor(post.id);
+      for (var i = 0; i < kids.length; i++) await S.db.doc("comments/" + kids[i].id).delete();
+      closeSheet();
+    } catch (e) { handleWriteError(e); }
+  }
+
+  async function setCadence(c) {
+    if (!canWrite() || !S.me.canEdit || S.config.cadence === c) return;
+    S.config.cadence = c;
+    render();
+    try {
+      await S.db.doc("config/mag").set({ cadence: c, setBy: S.me.id, at: Date.now() });
+      var iss = openIssue();
+      if (iss && iss.openedAt) {
+        await S.db.doc("issues/" + iss.id).update({ cadence: c, dueAt: dueFrom(iss.openedAt, c) });
+      }
+      S.error = "";
+    } catch (e) { handleWriteError(e); }
+  }
+
+  async function releaseIssue(iss) {
+    if (!canWrite() || !S.me.canEdit) return;
+    S.confirmRelease = false;
+    var now = Date.now();
+    try {
+      await S.db.doc("issues/" + iss.id).update({ status: "released", releasedAt: now, releasedBy: S.me.id });
+      var next = Math.max(iss.number || 0, S.issues.reduce(function (m, i) { return Math.max(m, i.number || 0); }, 0)) + 1;
+      await S.db.doc("issues/i" + next).set({
+        number: next, status: "open", cadence: S.config.cadence, openedAt: now, dueAt: dueFrom(now, S.config.cadence)
+      });
+      S.view = { kind: "issue", id: iss.id };
+      S.error = "";
+      render();
+    } catch (e) { handleWriteError(e); }
+  }
+
+  // ---------- boot ----------
+  function snapList(snap) {
+    return snap.docs.map(function (d) {
+      var o = Object.assign({}, d.data());
+      o.id = d.id;
+      return o;
+    });
+  }
+
+  async function boot() {
+    render();
+    var claude = window.claude;
+    if (!claude || !claude.use) { S.ready = true; render(); return; }
+
+    var user = await claude.use("user");
+    if (user) {
+      S.user = user;
+      var me = await user.me();
+      S.me.id = me.id;
+      S.me.name = me.name;
+      S.me.avatarUrl = me.avatarUrl;
+      S.me.canEdit = me.canEdit;
+      S.me.isOwner = me.isOwner;
+      if ((await user.can("data.write")) === false) S.writeBlocked = true;
+    }
+
+    var db = await claude.use("db");
+    S.ready = true;
+    if (!db) {
+      S.error = "This page can't reach its library right now, so nothing new can be submitted.";
+      render();
+      return;
+    }
+    S.db = db;
+
+    db.doc("config/mag").onSnapshot(function (snap) {
+      var d = snap.exists ? snap.data() : null;
+      if (d && (d.cadence === "weekly" || d.cadence === "monthly")) S.config.cadence = d.cadence;
+      render();
+    }, function () {});
+
+    db.collection("issues").orderBy("number", "desc").limit(200)
+      .onSnapshot(function (snap) { S.issues = snapList(snap); render(); }, function () {});
+
+    db.collection("posts").orderBy("createdAt", "desc").limit(500)
+      .onSnapshot(function (snap) { S.posts = snapList(snap); render(); },
+                  function () { S.error = "Lost the live connection. Reload to catch up."; render(); });
+
+    db.collection("comments").orderBy("createdAt", "asc").limit(1000)
+      .onSnapshot(function (snap) { S.comments = snapList(snap); render(); }, function () {});
+
+    db.collection("reactions").limit(1000)
+      .onSnapshot(function (snap) { S.reactions = snapList(snap); render(); }, function () {});
+
+    render();
+  }
+
+  document.getElementById("open-composer").addEventListener("click", openComposer);
+  document.getElementById("scrim").addEventListener("click", closeSheet);
+  document.getElementById("home").addEventListener("click", function () {
+    S.view = { kind: "current", id: null }; closeSheet(); window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (S.sheet) { closeSheet(); return; }
+      if (S.reader) closeReader();
+      return;
+    }
+    if (!S.reader || S.sheet) return;
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); turnPage(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); turnPage(-1); }
+  });
+
+  boot();
+})();
+</script>
