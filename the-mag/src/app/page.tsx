@@ -18,6 +18,7 @@ async function Welcome() {
     <div className="my-4 grid gap-1">
       <p>Hi, {profile?.display_name ?? "friend"}.</p>
       <Link href="/profile" className="underline">Profile</Link>
+      <Link href="/groups" className="underline">Groups</Link>
       <form action={signOut}>
         <button className="underline">Sign out</button>
       </form>
