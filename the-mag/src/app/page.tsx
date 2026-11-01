@@ -22,6 +22,7 @@ async function Welcome() {
       <Link href="/recs/new" className="underline">Submit a rec</Link>
       <Link href="/recs" className="underline">Your recs</Link>
       <Link href="/pokes" className="underline">Pokes for you</Link>
+      <Link href="/experiences" className="underline">Music experiences</Link>
       <form action={signOut}>
         <button className="underline">Sign out</button>
       </form>
