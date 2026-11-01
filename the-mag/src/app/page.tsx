@@ -19,6 +19,9 @@ async function Welcome() {
       <p>Hi, {profile?.display_name ?? "friend"}.</p>
       <Link href="/profile" className="underline">Profile</Link>
       <Link href="/groups" className="underline">Groups</Link>
+      <Link href="/recs/new" className="underline">Submit a rec</Link>
+      <Link href="/recs" className="underline">Your recs</Link>
+      <Link href="/pokes" className="underline">Pokes for you</Link>
       <form action={signOut}>
         <button className="underline">Sign out</button>
       </form>
